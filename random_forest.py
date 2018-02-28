@@ -34,6 +34,7 @@ def CreateSubmissionFile(testData, prediction):
 
 # brands
 # read from csv to Pandas DataFrame
+print("Reading phone brands data...")
 phoneBrands = pandas.read_csv("./data/phone_brand_device_model.csv", dtype={'device_id': np.str})
 phoneBrands.drop_duplicates('device_id', keep='first', inplace = True)
 phoneBrands = MapStringToInt(phoneBrands, 'phone_brand')
@@ -58,7 +59,7 @@ testData = pandas.merge(testData, phoneBrands, how='left', on='device_id', left_
 print("Building model...")
 clf = RandomForestClassifier(max_depth=2, random_state=0)
 clf.fit(trainData, trainLabel)
-
+# print(clf.classes_)
 print("Predicting...")
 
 CreateSubmissionFile(testData, clf.predict_proba(testData))
