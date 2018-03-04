@@ -1,5 +1,10 @@
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import BaggingClassifier
+from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.datasets import make_classification
+from sklearn.tree import DecisionTreeClassifier
 import pandas as pandas
 import numpy as np
 import datetime
@@ -61,9 +66,9 @@ events = events[['device_id', 'counts', 'installed', 'active']].drop_duplicates(
 print("Reading phone brands data...")
 phoneBrands = pandas.read_csv("./data/phone_brand_device_model.csv", dtype={'device_id': np.str})
 phoneBrands.drop_duplicates('device_id', keep='first', inplace = True)
-phoneBrands = MapStringToIntOrString(phoneBrands, 'phone_brand', True)
-phoneBrands = MapStringToIntOrString(phoneBrands, 'device_model', True)
-phoneBrands = pandas.get_dummies(phoneBrands, columns=['phone_brand', 'device_model'])
+phoneBrands = MapStringToIntOrString(phoneBrands, 'phone_brand', False)
+phoneBrands = MapStringToIntOrString(phoneBrands, 'device_model', False)
+# phoneBrands = pandas.get_dummies(phoneBrands, columns=['phone_brand', 'device_model'])
 # print(phoneBrands.head())
 
 # training set
@@ -87,7 +92,12 @@ testData = pandas.merge(testData, events, how='left', on='device_id', left_index
 testData.fillna(-1, inplace=True)
 
 print("Building model...")
-clf = RandomForestClassifier(max_depth=2, random_state=0)
+# clf = RandomForestClassifier(max_depth=2, random_state=0)
+# clf = AdaBoostClassifier(DecisionTreeClassifier(max_depth=1), algorithm="SAMME", n_estimators=200)
+# clf = AdaBoostClassifier()
+# clf = GradientBoostingClassifier()
+# clf = BaggingClassifier()
+clf = ExtraTreesClassifier()
 clf.fit(trainData, trainLabel)
 # print(clf.classes_)
 print("Predicting...")
