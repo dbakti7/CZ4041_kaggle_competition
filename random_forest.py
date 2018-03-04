@@ -5,13 +5,20 @@ import numpy as np
 import datetime
 import time
 
-def MapStringToInt(table, column):
+def MapStringToIntOrString(table, column, toString):
     # convert values from string to integer in column
     labels = sorted(table[column].unique())
     mapping = dict()
     for i in range(len(labels)):
-        mapping[labels[i]] = i
-    table = table.replace({column: mapping})
+        if(toString):
+            mapping[labels[i]] = str(i)
+        else:
+            mapping[labels[i]] = i
+    # table = table.replace({column: mapping})
+    # TODO: check why replace method yields error
+    # there are same values between source and the mapping when
+    # we are using string value.
+    table[column] = table[column].map(mapping)
     return table
 
 def CreateSubmissionFile(testData, prediction):
@@ -54,14 +61,15 @@ events = events[['device_id', 'counts', 'installed', 'active']].drop_duplicates(
 print("Reading phone brands data...")
 phoneBrands = pandas.read_csv("./data/phone_brand_device_model.csv", dtype={'device_id': np.str})
 phoneBrands.drop_duplicates('device_id', keep='first', inplace = True)
-phoneBrands = MapStringToInt(phoneBrands, 'phone_brand')
-phoneBrands = MapStringToInt(phoneBrands, 'device_model')
+phoneBrands = MapStringToIntOrString(phoneBrands, 'phone_brand', True)
+phoneBrands = MapStringToIntOrString(phoneBrands, 'device_model', True)
+phoneBrands = pandas.get_dummies(phoneBrands, columns=['phone_brand', 'device_model'])
 # print(phoneBrands.head())
 
 # training set
 print("Reading training data...")
 trainData = pandas.read_csv("./data/gender_age_train.csv", dtype={'device_id': np.str})
-trainData = MapStringToInt(trainData, 'group')
+trainData = MapStringToIntOrString(trainData, 'group', False)
 trainData = trainData.drop(['age'], axis=1)
 trainData = trainData.drop(['gender'], axis = 1)
 trainData = pandas.merge(trainData, phoneBrands, how='left', on='device_id', left_index=True)
