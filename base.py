@@ -34,7 +34,6 @@ def Preprocess(data, preprocess_type=None):
     # return type must be numpy array
     
     if (preprocess_type == "onehot"):
-        print("here")
         if(len(uniqueValues) == 0):
             GetUniqueValues(data.columns)
 
@@ -84,7 +83,6 @@ def GetData(preprocess=None, NFOLDS=5):
 
     if(preprocess):
         trainingData = Preprocess(trainingData, preprocess_type=preprocess)
-        print(trainingData)
         testData = Preprocess(testData, preprocess_type=preprocess)
     else:
         trainingData = trainingData.as_matrix()
